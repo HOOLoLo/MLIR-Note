@@ -15,4 +15,25 @@
 
 # TableGen Patterns
   
+Pattern 就是一个映射啊 ！ 把图映射成另一张图
+通过 TableGen 定义pattern 是一种方式
 
+调用 c++ 函数的 TableGen pattern
+
+def createTFLLeakyRelu : NativeCodeCall<
+    "createTFLLeakyRelu($_builder, $0.getDefiningOp(), $1, $2)">;
+
+def : Pat<(TF_LeakyReluOp:$old_value, $arg, F32Attr:$a),
+          (createTFLLeakyRelu $old_value, $arg, $a)>;
+
+static Value createTFLLeakyRelu(PatternRewriter &rewriter, Operation *op,
+                                Value operand, Attribute attr) {
+  return rewriter.create<mlir::TFL::LeakyReluOp>(
+      op->getLoc(), operands[0].getType(), /*arg=*/operands[0],
+      /*alpha=*/attrs[0].cast<FloatAttr>());
+}          
+
+This allows for arbitrarily complex builders. Input pattern side one can express multi-op patterns with constraints on input operands and attributes. But input patterns cannot yet express constraints across multiple operands/attributes.
+这允许 任意的 复杂的 builders 。 Input pattern s
+
+#
